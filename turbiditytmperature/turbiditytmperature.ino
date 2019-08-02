@@ -18,50 +18,40 @@ void setup(void)
   tmpsensor.begin();
 }
 
-String quality(float volt){
-  String q = "Filtered,No tred";
-  if(volt >= 4.0){
-    q = "Filtered,No tred";
-  }
-  else if(volt >= 3.25){
-    q = "very Slightly tred";
-  }
-  else if(volt >= 3.0){
-    q = "avarage tred";
-  }
-  else if(volt >= 2.5){
-    q = "heavy tred";
-  }
-  else if(volt >= 2.5){
-    q = "extrimely tred";
-  }
-  else if(volt < 2.5){
-    q = "tred is greater than water";
-  }
-  return q;
+float quality(float volt){
+  volt = 5.0 - volt;
+  volt = ((1995*(volt-4.8))/68)+100;
+  return volt;
 }
 
 
 
 void loop(void){ 
   int trsensor = analogRead(A0);
+  int phsensor = analogRead(A1);
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
   float voltage = trsensor * (5.0 / 1023.0);
   // print out the value you read:
-  Serial.print(quality(voltage));
-  Serial.print(" | Voltage Returned: ");
+   Serial.print("Turbidity (in NTU): ");
+  Serial.println(quality(voltage));
+  Serial.print("Voltage Return: ");
   Serial.println(voltage);
-  delay(1000);
-  
+  delay(2000);
+
+  float ph = phsensor * (5.0 / 1023.0);
+  Serial.print("PH Return: ");
+  Serial.println(ph);
+  ph = ph*2.8;
+  Serial.print("PH: ");
+  Serial.println(ph);
+  delay(2000);
   // Call tmpsensor.requestTemperatures() to issue a global temperature and Requests to all devices on the bus
   tmpsensor.requestTemperatures(); 
   
   Serial.print("Celsius temperature: ");
   // Why "byIndex"? You can have more than one IC on the same bus. 0 refers to the first IC on the wire
-  Serial.print(tmpsensor.getTempCByIndex(0)); 
-  Serial.print(" - Fahrenheit temperature: ");
+  Serial.println(tmpsensor.getTempCByIndex(0)); 
+  Serial.print("Fahrenheit temperature: ");
   Serial.println(tmpsensor.getTempFByIndex(0));
-  delay(1000);
+  delay(2000);
 }
-
-
